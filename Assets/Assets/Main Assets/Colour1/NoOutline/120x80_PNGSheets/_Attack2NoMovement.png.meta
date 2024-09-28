@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -95,7 +95,133 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: _Attack2NoMovement_0
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 0
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8108b01ff6c140f4b963e154e1d5dbe9
+      internalID: 2130164654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: _Attack2NoMovement_1
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 0
+        width: 40
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89c1791f724aeb349b58a5449bb5b767
+      internalID: 562606747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: _Attack2NoMovement_2
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 0
+        width: 75
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9461b6b083e6db0459d30affd77676a7
+      internalID: 1126451441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: _Attack2NoMovement_3
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 0
+        width: 62
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 209be818637d5984e94488a534e4dd0a
+      internalID: 1339677817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: _Attack2NoMovement_4
+      rect:
+        serializedVersion: 2
+        x: 505
+        y: 0
+        width: 44
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d50199017d7d4374984f9f4597590ee3
+      internalID: 1189448682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: _Attack2NoMovement_5
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 0
+        width: 43
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cef09263677d85d4887ab74b07bb9284
+      internalID: 723464050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -106,7 +232,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      _Attack2NoMovement_0: 2130164654
+      _Attack2NoMovement_1: 562606747
+      _Attack2NoMovement_2: 1126451441
+      _Attack2NoMovement_3: 1339677817
+      _Attack2NoMovement_4: 1189448682
+      _Attack2NoMovement_5: 723464050
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
