@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canDash = true;
     void Start()
     {
+        Physics2D.IgnoreLayerCollision(8,7,true);
         rend = GetComponent<SpriteRenderer>();
     }
 
@@ -48,12 +49,12 @@ public class PlayerMovement : MonoBehaviour
 
 
     private void OnCollisionExit2D(Collision2D col){
-        if (col.gameObject.name=="Ground"){
+        if (col.gameObject.CompareTag("Ground")){
             isJumping=true;
         }
     }
     private void OnCollisionEnter2D(Collision2D col){
-        if (col.gameObject.name=="Ground"){
+        if (col.gameObject.CompareTag("Ground")){
             isJumping=false;
         }
     }
@@ -80,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
         anim.SetFloat("Speed",Mathf.Abs(rb.velocity.x));
     }
     private void Strike(){
-            anim.SetTrigger("Strike");
+        anim.SetTrigger("Strike");
     }
     private IEnumerator Dash(){
         anim.SetTrigger("Dash");
