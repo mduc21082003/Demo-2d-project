@@ -5,28 +5,40 @@ using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-public class WindWarrior : MonoBehaviour
+public class WindWarrior : Enemy
 {
     public GameObject pointA;
     public GameObject pointB;
     public Rigidbody2D player;
     public Rigidbody2D rb;
-    private Animator anim;
     private Transform currentPoint;
     private float waitingTime=1f;
     private float speed=2f;
     private bool isCombat = false;
 
+    //combat
+
+
+
     void Start()
     {
+        currentHealth = maxHealth ;
         anim =GameObject.Find("Wind warrior/Sprite").GetComponent<Animator>();
         currentPoint= pointB.transform;
         anim.SetBool("isRunning",true);
     }
-
+    
 
     void Update()
     {
+        //combat check
+        if (Vector2.Distance(player.position,rb.position)<7f){
+            isCombat=true;
+            anim.SetBool("isRunning",false);
+        }
+        else{
+            isCombat=false;
+        }
         if (!isCombat){
                 if (currentPoint == pointB.transform){
                     rb.velocity = new Vector2(speed,0); 
@@ -36,11 +48,9 @@ public class WindWarrior : MonoBehaviour
                 }
             
             if (pointB.transform.position.x-rb.position.x<0.1f && currentPoint == pointB.transform && speed!=0){
-                print("abc");
                 StartCoroutine(StopMoving(pointA.transform));
             }
             if (pointA.transform.position.x-rb.position.x>0.1f && currentPoint == pointA.transform && speed!=0){
-                print("abc");
                 StartCoroutine(StopMoving(pointB.transform));
             }
         }
@@ -63,4 +73,5 @@ public class WindWarrior : MonoBehaviour
         currentPoint = targetPos;
 
     }
+    
 }

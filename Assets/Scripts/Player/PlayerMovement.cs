@@ -5,7 +5,15 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    //playerstats
+    public int playerDamage=20;
+    public int playerMaxHealth=100;
+    private int playerCurrentHealth;
 
+
+
+
+    //movement
     private float speed=8f;
     private float jump=500f;
     private float move ;
@@ -14,8 +22,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]private Rigidbody2D rb;
     private SpriteRenderer rend;
     public Animator anim;
+
+
+
+    //attack
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
+    public Transform attackPoint;
+    public float attackRange = 0.9f;
+    public LayerMask enemyLayers;
+
+    //Dash
     public float dashingPower = 40f;
     private float dashingTime = 0.3f;
 
@@ -24,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canDash = true;
     void Start()
     {
+        playerCurrentHealth = playerMaxHealth;
         Physics2D.IgnoreLayerCollision(8,7,true);
         rend = GetComponent<SpriteRenderer>();
     }
@@ -38,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
         Flip();
         Jump();
         if (Time.time >= nextAttackTime && Input.GetKeyDown(KeyCode.J)){
-            Strike();
+            anim.SetTrigger("Strike");
             nextAttackTime = Time.time + 1f/ attackRate;
         }
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash && rb.velocity.y==0){
@@ -81,7 +99,11 @@ public class PlayerMovement : MonoBehaviour
         anim.SetFloat("Speed",Mathf.Abs(rb.velocity.x));
     }
     private void Strike(){
-        anim.SetTrigger("Strike");
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position,attackRange,enemyLayers);
+        foreach (Collider2D enemy in hitEnemies){
+            print(enemy.name);
+            enemy.GetComponent<Enemy>().TakeDamage(playerDamage);
+        }
     }
     private IEnumerator Dash(){
         anim.SetTrigger("Dash");
@@ -97,5 +119,11 @@ public class PlayerMovement : MonoBehaviour
         isDashing = false;
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
+    }
+    void OnDrawGizmosSelected(){
+        Gizmos.DrawWireSphere(attackPoint.position,attackRange);
+    }
+    public void TakeDamage(){
+        
     }
 }
