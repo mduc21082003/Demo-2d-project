@@ -17,13 +17,13 @@ public class WindWarrior : Enemy
     private bool isCombat = false;
 
     //combat
-
+    private float teleportCooldown = 3f;
 
 
     void Start()
     {
         currentHealth = maxHealth ;
-        anim =GameObject.Find("Wind warrior/Sprite").GetComponent<Animator>();
+        anim =GetComponent<Animator>();
         currentPoint= pointB.transform;
         anim.SetBool("isRunning",true);
     }
@@ -36,7 +36,7 @@ public class WindWarrior : Enemy
             isCombat=true;
             anim.SetBool("isRunning",false);
         }
-        else{
+        if (Vector2.Distance(player.position,rb.position)>15f && isCombat == true){
             isCombat=false;
         }
         if (!isCombat){
@@ -54,8 +54,18 @@ public class WindWarrior : Enemy
                 StartCoroutine(StopMoving(pointB.transform));
             }
         }
-        else{
 
+
+
+        //combat 
+        else{
+            if (teleportCooldown<=0){
+                anim.SetTrigger("Teleport");
+                teleportCooldown =3f;
+            }
+            else{
+                teleportCooldown -=Time.deltaTime;
+            }
         }
     }
     private void Flip(){
@@ -73,5 +83,7 @@ public class WindWarrior : Enemy
         currentPoint = targetPos;
 
     }
-    
+    void TelePort(){
+        rb.position = new Vector2(player.position.x-0.8f,player.position.y);
+    }
 }

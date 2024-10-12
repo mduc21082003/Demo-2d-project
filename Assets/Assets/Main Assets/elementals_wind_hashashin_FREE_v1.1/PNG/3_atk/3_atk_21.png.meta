@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -95,7 +95,49 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: 3_atk_21_0
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 13
+        width: 38
+        height: 46
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 180e02587b479be438f62e96c492fc7e
+      internalID: 1560745457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 3_atk_21_2
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 45
+        height: 46
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92008a699da7c994c95fc999d8c7c6da
+      internalID: -1982925107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -106,7 +148,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      3_atk_21_0: 1560745457
+      3_atk_21_1: 1405758933
+      3_atk_21_2: -1982925107
+      3_atk_21_3: -162294518
+      3_atk_21_4: -506317561
+      3_atk_21_5: -324647308
+      3_atk_21_6: -1408184184
+      3_atk_21_7: -35387504
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
