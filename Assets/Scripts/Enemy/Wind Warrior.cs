@@ -11,13 +11,15 @@ public class WindWarrior : Enemy
     public GameObject pointB;
     public Rigidbody2D player;
     public Rigidbody2D rb;
+
     private Transform currentPoint;
     private float waitingTime=1f;
-    private float speed=2f;
+    private float speed=3f;
     private bool isCombat = false;
-
+    private bool isFacingRight =true;
     //combat
-    private float teleportCooldown = 3f;
+    private float teleportCooldown = 14f;
+    private float normalATKCooldown = 4f;
 
 
     void Start()
@@ -31,13 +33,21 @@ public class WindWarrior : Enemy
 
     void Update()
     {
+        SetCooldown();
+        if(rb.velocity.x < 0 && isFacingRight == true){
+            Flip();
+        }
+        if(rb.velocity.x > 0 && isFacingRight == false){
+            Flip();
+        }
         //combat check
         if (Vector2.Distance(player.position,rb.position)<7f){
             isCombat=true;
             anim.SetBool("isRunning",false);
         }
-        if (Vector2.Distance(player.position,rb.position)>15f && isCombat == true){
+        if (Vector2.Distance(player.position,rb.position)>14f && isCombat == true){
             isCombat=false;
+            currentHealth=maxHealth;
         }
         if (!isCombat){
                 if (currentPoint == pointB.transform){
@@ -59,16 +69,25 @@ public class WindWarrior : Enemy
 
         //combat 
         else{
-            if (teleportCooldown<=0){
-                anim.SetTrigger("Teleport");
-                teleportCooldown =3f;
+            if (Vector2.Distance(rb.position,player.position)<2f){
+
             }
-            else{
-                teleportCooldown -=Time.deltaTime;
+            if (Vector2.Distance(rb.position,player.position)<6f && Vector2.Distance(rb.position,player.position) > 2f){
+                if (teleportCooldown <= 0.001f ){
+                    anim.SetTrigger("Teleport");
+                    teleportCooldown = 14f;
+                }
+                else{
+                    Chase();
+                }
+            }
+            if (Vector2.Distance(rb.position,player.position)<12f&&Vector2.Distance(rb.position,player.position)>6f){
+                Chase();
             }
         }
     }
     private void Flip(){
+        isFacingRight = !isFacingRight;
         Vector2 localscale = transform.localScale;
         localscale.x *=-1;
         transform.localScale = localscale;
@@ -77,13 +96,29 @@ public class WindWarrior : Enemy
         speed = 0f;
         anim.SetBool("isRunning",false);
         yield return new WaitForSeconds(waitingTime);
-        Flip();
         anim.SetBool("isRunning",true);
-        speed=2f;
+        speed=3f;
         currentPoint = targetPos;
-
     }
     void TelePort(){
-        rb.position = new Vector2(player.position.x-0.8f,player.position.y);
+        rb.position = new Vector2(player.position.x-1f,player.position.y);
+    }
+    public void Chase(){
+        Vector2 direction = new Vector2(rb.position.x-player.position.x,0f);
+        anim.SetBool("isRunning",true);
+        if (direction.x<0f){
+            rb.velocity = new Vector2(speed,0f);
+        }
+        else{
+            rb.velocity = new Vector2(-speed,0f);
+        }
+    }
+    public void SetCooldown(){
+        if(teleportCooldown>0){
+            teleportCooldown -= Time.deltaTime;
+        }
+        if (normalATKCooldown>0){
+            normalATKCooldown -= Time.deltaTime;
+        }
     }
 }
