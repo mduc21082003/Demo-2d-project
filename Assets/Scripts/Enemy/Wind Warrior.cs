@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class WindWarrior : Enemy
 {
@@ -14,12 +15,25 @@ public class WindWarrior : Enemy
 
     private Transform currentPoint;
     private float waitingTime=1f;
-    private float speed=3f;
+    private float speed=4.5f;
     private bool isCombat = false;
     private bool isFacingRight =true;
+
+
     //combat
-    private float teleportCooldown = 14f;
-    private float normalATKCooldown = 4f;
+    private int combatState = 1;
+    private int combatFury = 0;
+
+    private float teleportCooldown = 0f;
+    private float attackCooldown = 0f;
+    private float ATK1Cooldown = 0f;
+    private float ATK2Cooldown = 0f;
+    private float ATK3Cooldown = 0f;
+    private float attackCD = 3f;
+    private float teleportCD = 14f;
+    private float ATK1CD =3f;
+    private float ATK2CD =8f;
+    private float ATK3CD = 16f;
 
 
     void Start()
@@ -33,6 +47,7 @@ public class WindWarrior : Enemy
 
     void Update()
     {
+        combatState = Random.Range(1,3);
         SetCooldown();
         if(rb.velocity.x < 0 && isFacingRight == true){
             Flip();
@@ -49,7 +64,7 @@ public class WindWarrior : Enemy
             isCombat=false;
             currentHealth=maxHealth;
         }
-        if (!isCombat){
+        if (isCombat==false){
                 if (currentPoint == pointB.transform){
                     rb.velocity = new Vector2(speed,0); 
                 }
@@ -65,23 +80,31 @@ public class WindWarrior : Enemy
             }
         }
 
-
-
         //combat 
         else{
-            if (Vector2.Distance(rb.position,player.position)<2f){
 
+            if (Vector2.Distance(rb.position,player.position)<2f && attackCooldown<=0f){
+                attackCooldown=attackCD;
+                if(combatFury ==8){
+                    combatFury = 0;
+                    SpecialAttack();
+                }
+                else if (combatFury!=20){
+                    Attack();
+                }
             }
+
             if (Vector2.Distance(rb.position,player.position)<6f && Vector2.Distance(rb.position,player.position) > 2f){
-                if (teleportCooldown <= 0.001f ){
+                if (teleportCooldown <= 0f ){
                     anim.SetTrigger("Teleport");
-                    teleportCooldown = 14f;
+                    teleportCooldown = teleportCD;
                 }
                 else{
                     Chase();
                 }
             }
-            if (Vector2.Distance(rb.position,player.position)<12f&&Vector2.Distance(rb.position,player.position)>6f){
+
+            if (Vector2.Distance(rb.position,player.position)<12f && Vector2.Distance(rb.position,player.position)>6f){
                 Chase();
             }
         }
@@ -100,8 +123,52 @@ public class WindWarrior : Enemy
         speed=3f;
         currentPoint = targetPos;
     }
-    void TelePort(){
+    public void TelePort(){
         rb.position = new Vector2(player.position.x-1f,player.position.y);
+    }
+    public void TelePort2(){
+        rb.position = new Vector2(player.position.x+1f,player.position.y);
+    }
+    public void Attack(){
+        combatState = Random.Range(1,3);
+        
+        if (combatState==1 && ATK1Cooldown <=0f){
+            print("ATK1");
+            ATK1Cooldown = ATK1CD;
+            combatFury ++;
+            return;
+        }
+        if (ATK1Cooldown >0){
+            combatState =2;
+        }
+        if (combatState==2 && ATK2Cooldown <=0f){
+            print("ATK2");
+            ATK2Cooldown = ATK2CD;
+            combatFury ++;
+            return;
+        }
+        if (ATK2Cooldown >0){
+            combatState =3;
+        }
+        if (combatState==3 && ATK3Cooldown <=0f){
+            print("ATK3");
+            ATK3Cooldown = ATK3CD;
+            combatFury ++;
+            return;
+        }
+        
+    }
+    public void ATK1(){
+
+    }
+    public void AirATK(){
+
+    }
+    public void ATK3(){
+
+    }
+    public void SpecialAttack(){
+        print("SPATK");
     }
     public void Chase(){
         Vector2 direction = new Vector2(rb.position.x-player.position.x,0f);
@@ -117,8 +184,17 @@ public class WindWarrior : Enemy
         if(teleportCooldown>0){
             teleportCooldown -= Time.deltaTime;
         }
-        if (normalATKCooldown>0){
-            normalATKCooldown -= Time.deltaTime;
+        if(attackCooldown>0){
+            attackCooldown -=Time.deltaTime;
+        }
+        if (ATK1Cooldown>0){
+            ATK1Cooldown -= Time.deltaTime;
+        }
+        if (ATK2Cooldown>0){
+            ATK2Cooldown -= Time.deltaTime;
+        }
+        if (ATK3Cooldown>0){
+            ATK3Cooldown -= Time.deltaTime;
         }
     }
 }
