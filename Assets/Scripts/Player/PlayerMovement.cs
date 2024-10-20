@@ -1,17 +1,19 @@
 using System.Collections;
-using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
     //playerstats
-    public int playerDamage=20;
-    public int playerMaxHealth=100;
-    private int playerCurrentHealth;
+    public float playerDamage=20;
+    public float playerMaxHealth=100;
+    [SerializeField]private float currentHealth;
+    public bool invulnerable=false;
 
 
-
+    //ui
+    public Image healthBar;
+    public Text potion;
 
     //movement
     private float speed=8f;
@@ -24,10 +26,16 @@ public class PlayerMovement : MonoBehaviour
     public Animator anim;
 
 
+    //heal 
+    private int potionStack=3;
+    private float healRate=3f;
+    private float nextHealTime=0f;
 
     //attack
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
+
+
     public Transform attackPoint;
     public float attackRange = 0.9f;
     public LayerMask enemyLayers;
@@ -41,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canDash = true;
     void Start()
     {
-        playerCurrentHealth = playerMaxHealth;
+        currentHealth = playerMaxHealth;
         Physics2D.IgnoreLayerCollision(8,7,true);
         rend = GetComponent<SpriteRenderer>();
     }
@@ -49,16 +57,30 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        potion.text = potionStack.ToString();
+        SetCoolDown();
+        healthBar.fillAmount =currentHealth/ playerMaxHealth;
         if (isDashing){
             return;
         }
         Move();
         Flip();
         Jump();
+        if (nextHealTime <=0 && Input.GetKeyDown(KeyCode.E) && potionStack>0){
+            potionStack -= 1;
+            nextHealTime = healRate;
+            currentHealth += 35f;
+            if (currentHealth>playerMaxHealth){
+                currentHealth = playerMaxHealth;
+            }
+        }
+
         if (Time.time >= nextAttackTime && Input.GetKeyDown(KeyCode.J)){
             anim.SetTrigger("Strike");
             nextAttackTime = Time.time + 1f/ attackRate;
         }
+
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash && rb.velocity.y==0){
             StartCoroutine(Dash());
         }
@@ -123,7 +145,19 @@ public class PlayerMovement : MonoBehaviour
     void OnDrawGizmosSelected(){
         Gizmos.DrawWireSphere(attackPoint.position,attackRange);
     }
-    public void TakeDamage(){
-        
+    public void TakeDamage(float damage){
+        if (invulnerable==false){
+            currentHealth -= damage;
+            anim.SetTrigger("Hurt");
+            if (currentHealth <= 0){
+                //dead
+                invulnerable=true;
+                anim.SetBool("isDead",true);
+            }}
+    }
+    public void SetCoolDown(){
+        if (nextHealTime >0){
+            nextHealTime -= Time.deltaTime;
+        }
     }
 }

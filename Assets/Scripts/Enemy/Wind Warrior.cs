@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.UI;
 
 public class WindWarrior : Enemy
 {
@@ -16,38 +17,63 @@ public class WindWarrior : Enemy
     private Transform currentPoint;
     private float waitingTime=1f;
     private float speed=4.5f;
-    private bool isCombat = false;
+    
     private bool isFacingRight =true;
+
+    //ui
+    
+
+
 
 
     //combat
-    private int combatState = 1;
-    private int combatFury = 0;
+    public Transform attackPoint;
+    public float attackRange = 0.9f;
+    public LayerMask enemyLayers;
+    public GameObject tornado;
 
+    private int combatState = 1;
+    [SerializeField]private int combatFury = 0;
+
+
+
+    private float rollCooldown = 0f;
     private float teleportCooldown = 0f;
-    private float attackCooldown = 0f;
+    [SerializeField]private float attackCooldown = 0f;
     private float ATK1Cooldown = 0f;
-    private float ATK2Cooldown = 0f;
+    private float AirATKCooldown = 0f;
     private float ATK3Cooldown = 0f;
-    private float attackCD = 3f;
-    private float teleportCD = 14f;
-    private float ATK1CD =3f;
-    private float ATK2CD =8f;
-    private float ATK3CD = 16f;
+
+
+    private float attackCD = 1f;
+    private float teleportCD = 8f;
+    private float ATK1CD =2f;
+    private float AirATKCD =4f;
+    private float ATK3CD = 10f;
 
 
     void Start()
     {
+        bossHealthBar.SetActive(false);
+        bossname.text = "The Wind"; 
         currentHealth = maxHealth ;
         anim =GetComponent<Animator>();
         currentPoint= pointB.transform;
-        anim.SetBool("isRunning",true);
     }
     
 
     void Update()
     {
-        combatState = Random.Range(1,3);
+        if (currentHealth <= 0){
+            anim.SetBool("isDead",true);
+            print("dead");
+            Invoke("Destroy",2f);
+
+        }
+        if (isCombat==false){
+            bossHealthBar.SetActive(false);
+        }
+        healthBar.fillAmount = currentHealth/maxHealth;
         SetCooldown();
         if(rb.velocity.x < 0 && isFacingRight == true){
             Flip();
@@ -56,15 +82,16 @@ public class WindWarrior : Enemy
             Flip();
         }
         //combat check
-        if (Vector2.Distance(player.position,rb.position)<7f){
+        if (Vector2.Distance(player.position,rb.position) < 7f && currentHealth > 0){
             isCombat=true;
+            bossHealthBar.SetActive(true);
             anim.SetBool("isRunning",false);
         }
-        if (Vector2.Distance(player.position,rb.position)>14f && isCombat == true){
+        if (Vector2.Distance(player.position,rb.position) > 14f && isCombat == true){
             isCombat=false;
             currentHealth=maxHealth;
         }
-        if (isCombat==false){
+        if (isCombat==false && currentHealth>0){
                 if (currentPoint == pointB.transform){
                     rb.velocity = new Vector2(speed,0); 
                 }
@@ -83,14 +110,17 @@ public class WindWarrior : Enemy
         //combat 
         else{
 
-            if (Vector2.Distance(rb.position,player.position)<2f && attackCooldown<=0f){
-                attackCooldown=attackCD;
-                if(combatFury ==8){
+            if (Vector2.Distance(rb.position,player.position)<2f){
+                rb.velocity = new Vector2(0,0);
+                if(combatFury >= 6 && attackCooldown <= 0){
                     combatFury = 0;
-                    SpecialAttack();
+                    attackCooldown = attackCD*3;
+                    anim.SetTrigger("SpecialATK");
+                    StartCoroutine(LockMovement(1f));
                 }
-                else if (combatFury!=20){
+                if (combatFury < 6 && attackCooldown <= 0){
                     Attack();
+                    StartCoroutine(LockMovement(1f));
                 }
             }
 
@@ -123,17 +153,24 @@ public class WindWarrior : Enemy
         speed=3f;
         currentPoint = targetPos;
     }
+    private IEnumerator LockMovement(float lockTime){
+        speed = 0f;
+        yield return new WaitForSeconds(lockTime);
+        speed = 3f;
+    }
     public void TelePort(){
-        rb.position = new Vector2(player.position.x-1f,player.position.y);
+        rb.position = new Vector2(player.position.x-0.85f,player.position.y);
+        SetDirection();
     }
     public void TelePort2(){
-        rb.position = new Vector2(player.position.x+1f,player.position.y);
+        rb.position = new Vector2(player.position.x+0.85f,player.position.y);
+        SetDirection();
     }
     public void Attack(){
-        combatState = Random.Range(1,3);
-        
+        attackCooldown=attackCD;
+        combatState = Random.Range(1,4);
         if (combatState==1 && ATK1Cooldown <=0f){
-            print("ATK1");
+            anim.SetTrigger("ATK1");
             ATK1Cooldown = ATK1CD;
             combatFury ++;
             return;
@@ -141,36 +178,71 @@ public class WindWarrior : Enemy
         if (ATK1Cooldown >0){
             combatState =2;
         }
-        if (combatState==2 && ATK2Cooldown <=0f){
-            print("ATK2");
-            ATK2Cooldown = ATK2CD;
+        if (combatState==2 && AirATKCooldown <=0f){
+            anim.SetTrigger("AirATK");
+            AirATKCooldown = AirATKCD;
             combatFury ++;
             return;
         }
-        if (ATK2Cooldown >0){
+        if (AirATKCooldown >0){
             combatState =3;
         }
         if (combatState==3 && ATK3Cooldown <=0f){
-            print("ATK3");
+            anim.SetTrigger("ATK3");
+            attackCooldown = attackCD*2;
             ATK3Cooldown = ATK3CD;
             combatFury ++;
             return;
         }
+        if (AirATKCooldown >0){
+            combatState =1;
+        }
         
     }
-    public void ATK1(){
-
+    public void LightAttack(){
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position,attackRange,enemyLayers);
+        foreach (Collider2D enemy in hitEnemies){
+            print(enemy.name);
+            enemy.GetComponent<PlayerMovement>().TakeDamage(damage*1);
+        }
     }
     public void AirATK(){
-
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position,attackRange,enemyLayers);
+        foreach (Collider2D enemy in hitEnemies){
+            print(enemy.name);
+            enemy.GetComponent<PlayerMovement>().TakeDamage(damage*0.7f);
+        }
     }
-    public void ATK3(){
-
+    public void QuickAttack(){
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position,attackRange,enemyLayers);
+        foreach (Collider2D enemy in hitEnemies){
+            print(enemy.name);
+            enemy.GetComponent<PlayerMovement>().TakeDamage(damage*0.4f);
+        }
     }
-    public void SpecialAttack(){
-        print("SPATK");
+    public void SpawnTornado(){
+        tornado.SetActive(true);
+        tornado.transform.position = new Vector2(rb.position.x,rb.position.y);
+        Invoke("DestroyTornado",0.75f);
+    }
+    
+    public void DestroyTornado(){
+        tornado.SetActive(false);
+    }
+    public void SetDirection(){
+        if (rb.position.x-player.position.x >0){
+            Vector2 localscale = transform.localScale;
+            localscale.x = -4;
+            transform.localScale = localscale;
+        }
+        if (rb.position.x-player.position.x <0){
+            Vector2 localscale = transform.localScale;
+            localscale.x = 4;
+            transform.localScale = localscale;
+        }
     }
     public void Chase(){
+        SetDirection();
         Vector2 direction = new Vector2(rb.position.x-player.position.x,0f);
         anim.SetBool("isRunning",true);
         if (direction.x<0f){
@@ -180,7 +252,11 @@ public class WindWarrior : Enemy
             rb.velocity = new Vector2(-speed,0f);
         }
     }
+
     public void SetCooldown(){
+        if (rollCooldown>0){
+            rollCooldown -= Time.deltaTime;
+        }
         if(teleportCooldown>0){
             teleportCooldown -= Time.deltaTime;
         }
@@ -190,11 +266,14 @@ public class WindWarrior : Enemy
         if (ATK1Cooldown>0){
             ATK1Cooldown -= Time.deltaTime;
         }
-        if (ATK2Cooldown>0){
-            ATK2Cooldown -= Time.deltaTime;
+        if (AirATKCooldown>0){
+            AirATKCooldown -= Time.deltaTime;
         }
         if (ATK3Cooldown>0){
             ATK3Cooldown -= Time.deltaTime;
         }
+    }
+    void OnDrawGizmosSelected(){
+        Gizmos.DrawWireSphere(attackPoint.position,attackRange);
     }
 }
